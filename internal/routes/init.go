@@ -7,5 +7,8 @@ import (
 
 func InitRoutes(app *fiber.App, store *sqlx.DB) {
 	// init the main API router
-	_ = app.Group("/v1")	
+	r := app.Group("/v1")
+
+	// plug other groups of routes
+	shopRoutes(r, store)
 }

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"botmanager/internal/routes"
 	"botmanager/internal/setup"
-	"github.com/joho/godotenv"
 	"log/slog"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -12,9 +14,9 @@ func main() {
 		slog.Error("environment not found")
 	}
 
-	// import database 
+	// import database
 	dbConfig := setup.NewDBConfig()
-	_, err := setup.NewDB(
+	store, err := setup.NewDB(
 		dbConfig.User,
 		dbConfig.Password,
 		dbConfig.Host,
@@ -28,6 +30,13 @@ func main() {
 	// set up http server
 	httpConfig := setup.NewHTTPConfig()
 	app := setup.NewHTTPServer()
+
+	// init routes and bots
+	routes.InitRoutes(app, store)
+	err = setup.InitBots(store)
+	if err != nil {
+		slog.Error("init bots failed")
+	}
 
 	err = app.Listen(httpConfig.BuildIP())
 	if err != nil {
