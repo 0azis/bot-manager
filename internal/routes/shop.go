@@ -18,6 +18,5 @@ func shopRoutes(r fiber.Router, store *sqlx.DB) {
 	// set routes of bot group
 	bot := r.Group("/bot")
 	bot.Post("/", controllers.RunOneBot)
-	// bot.Patch("/", controllers.RunAfterUpdate)
 	bot.Delete("/", controllers.StopOneBot)
 }

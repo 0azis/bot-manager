@@ -4,7 +4,10 @@ import (
 	"botmanager/internal/models"
 	"botmanager/internal/repos"
 	"botmanager/internal/setup"
+	"fmt"
 	"net/http"
+
+	// "time"
 
 	// "time"
 
@@ -44,20 +47,21 @@ func (sc ShopControllers) RunOneBot(c *fiber.Ctx) error {
 
 	// check for already running bot
 	if setup.GoroutineExists(shopCredentials.Token) {
+		fmt.Println("HERE")
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
 	// check for unvalid token
-	// if shopCredentials.IsToken() {
-	// 	return fiber.NewError(400, http.StatusText(400))
-	// }
+	if sc.repo.IsTokenValid(shopCredentials.Token) {
+		return fiber.NewError(400, http.StatusText(400))
+	}
 
 	// create a channel for this goroutine
 	ch := make(chan bool)
-	// add goroutine and its channel to map
+	// // add goroutine and its channel to map
 	setup.Goroutines[shopCredentials.Token] = ch
 
-	// start goroutine
+	// // start goroutine
 	go setup.BotWorker(shopCredentials.Token, sc.repo)
 
 	ch <- true
@@ -73,9 +77,9 @@ func (sc ShopControllers) StopOneBot(c *fiber.Ctx) error {
 	}
 
 	// check for unvalid token
-	// if shopCredentials.IsToken() { 
-	// 	return fiber.NewError(400, http.StatusText(400))
-	// }
+	if sc.repo.IsTokenValid(shopCredentials.Token) {
+		return fiber.NewError(400, http.StatusText(400))
+	}
 
 	// get channel from map
 	ch := setup.Goroutines[shopCredentials.Token]

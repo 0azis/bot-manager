@@ -12,6 +12,7 @@ func main() {
 	// load ENV data (database config, http server config and etc.)
 	if err := godotenv.Load("../.env"); err != nil {
 		slog.Error("environment not found")
+		return
 	}
 
 	// import database
@@ -25,6 +26,7 @@ func main() {
 	)
 	if err != nil {
 		slog.Error("database running failed")
+		return 
 	}
 
 	// set up http server
@@ -36,10 +38,12 @@ func main() {
 	err = setup.InitBots(store)
 	if err != nil {
 		slog.Error("init bots failed")
+		return 
 	}
 
 	err = app.Listen(httpConfig.BuildIP())
 	if err != nil {
 		slog.Error("http server running failed")
+		return
 	}
 }

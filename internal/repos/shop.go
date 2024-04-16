@@ -12,6 +12,7 @@ type ShopRepo interface {
 	Select() ([]models.Shop, error)
 	Get(token string) (models.Shop, error)
 	UpdateStatus(token string, status bool) error
+	IsTokenValid(token string) bool
 }
 
 type shop struct {
@@ -34,9 +35,14 @@ func (s shop) Get(token string) (models.Shop, error) {
 
 // update work status of shop
 func (s shop) UpdateStatus(token string, status bool) error {
-	fmt.Println(fmt.Sprintf("update shop set isActive = %t where token = '%s'", status, token))
 	_, err := s.db.Query(fmt.Sprintf("update shop set isActive = %t where token = '%s'", status, token))
 	return err
+}
+
+func (s shop) IsTokenValid(token string) bool {
+	var isToken string
+	err := s.db.Get(&isToken, `select token from shop where token = $1`, token)
+	return err != nil
 }
 
 // init a new shop repository
