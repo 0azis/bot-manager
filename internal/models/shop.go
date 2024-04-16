@@ -36,7 +36,4 @@ type ShopCredentials struct {
 	Token string `json:"token"`
 }
 
-// func (sc ShopCredentials) IsToken() bool {
-// 	_, err := bot.New(sc.Token)
-// 	return err != nil
-// }
+ 

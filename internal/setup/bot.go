@@ -23,13 +23,14 @@ func BotWorker(token string, repo repos.ShopRepo) {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	botData, err := repo.Get(token)
-	if err != nil {
-		return
-	}
+	botData, _ := repo.Get(token)
 
 	opts := []bot.Option{
 		bot.WithDefaultHandler(func (ctx context.Context, b *bot.Bot, update *tg_models.Update) {
+			b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: update.Message.Chat.ID,
+				Text:   update.Message.Text,
+			})	
 			b.SetChatMenuButton(ctx, &bot.SetChatMenuButtonParams{
 				ChatID: update.Message.Chat.ID,
 				MenuButton: tg_models.MenuButtonWebApp{
