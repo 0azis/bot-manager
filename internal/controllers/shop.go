@@ -16,11 +16,12 @@ import (
 
 // implement controllers from repo
 type ShopControllers struct {
-	repo repos.ShopRepo
+	shopRepo repos.ShopRepo
+	subRepo  repos.SubscriberRepo
 }
 
 // func (sc ShopControllers) RunAfterUpdate(c *fiber.Ctx) error {
-// 	var shopCredentials models.ShopCredentials 
+// 	var shopCredentials models.ShopCredentials
 // 	err := c.BodyParser(&shopCredentials)
 // 	if err != nil {
 // 		return fiber.NewError(400, http.StatusText(400))
@@ -28,7 +29,7 @@ type ShopControllers struct {
 
 // 	if shopCredentials.IsToken() {
 // 		return fiber.NewError(404, http.StatusText(404))
-// 	} 
+// 	}
 
 // 	updatedBot, err := sc.repo.Get(shopCredentials.Token)
 // 	if err != nil {
@@ -47,22 +48,22 @@ func (sc ShopControllers) RunOneBot(c *fiber.Ctx) error {
 
 	// check for already running bot
 	if setup.GoroutineExists(shopCredentials.Token) {
-		fmt.Println("HERE")
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
 	// check for unvalid token
-	if sc.repo.IsTokenValid(shopCredentials.Token) {
+	if sc.shopRepo.IsTokenValid(shopCredentials.Token) {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
 	// create a channel for this goroutine
 	ch := make(chan bool)
+	fmt.Println(ch)
 	// // add goroutine and its channel to map
 	setup.Goroutines[shopCredentials.Token] = ch
 
 	// // start goroutine
-	go setup.BotWorker(shopCredentials.Token, sc.repo)
+	go setup.BotWorker(shopCredentials.Token, sc.shopRepo, sc.subRepo)
 
 	ch <- true
 
@@ -77,7 +78,7 @@ func (sc ShopControllers) StopOneBot(c *fiber.Ctx) error {
 	}
 
 	// check for unvalid token
-	if sc.repo.IsTokenValid(shopCredentials.Token) {
+	if sc.shopRepo.IsTokenValid(shopCredentials.Token) {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
@@ -96,8 +97,9 @@ func (sc ShopControllers) StopOneBot(c *fiber.Ctx) error {
 	return fiber.NewError(200, http.StatusText(200))
 }
 
-func NewShopControllers(repo repos.ShopRepo) *ShopControllers {
+func NewShopControllers(shopRepo repos.ShopRepo, subRepo repos.SubscriberRepo) *ShopControllers {
 	return &ShopControllers{
-		repo: repo,
+		shopRepo: shopRepo,
+		subRepo: subRepo,
 	}
 }

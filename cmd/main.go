@@ -1,8 +1,10 @@
 package main
 
 import (
+	// "botmanager/internal/repos"
 	"botmanager/internal/routes"
 	"botmanager/internal/setup"
+	// "fmt"
 	"log/slog"
 
 	"github.com/joho/godotenv"
@@ -28,6 +30,10 @@ func main() {
 		slog.Error("database running failed")
 		return 
 	}
+
+	// repo := repos.NewSubscriberRepo(store)
+	// subs, _ := repo.Select()
+	// fmt.Println(subs)
 
 	// set up http server
 	httpConfig := setup.NewHTTPConfig()

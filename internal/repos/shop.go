@@ -13,6 +13,7 @@ type ShopRepo interface {
 	Get(token string) (models.Shop, error)
 	UpdateStatus(token string, status bool) error
 	IsTokenValid(token string) bool
+	ShopByBot(botID string) (string, error)
 }
 
 type shop struct {
@@ -31,6 +32,12 @@ func (s shop) Get(token string) (models.Shop, error) {
 	shop := models.Shop{}
 	err := s.db.Get(&shop, `select * from shop where token = $1`, token)
 	return shop, err
+}
+
+func (s shop) ShopByBot(botID string) (string, error) {
+	var shopID string
+	err := s.db.Get(&shopID, `select id from shop where bot_id = $1`, botID)
+	return shopID, err
 }
 
 // update work status of shop
