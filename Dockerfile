@@ -7,6 +7,6 @@ RUN go mod download
 
 RUN go build -o ./server
 
-EXPOSE 3000
+EXPOSE 8000 
 
 CMD ["./server"]

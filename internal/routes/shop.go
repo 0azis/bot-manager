@@ -9,11 +9,12 @@ import (
 )
 
 func shopRoutes(r fiber.Router, store *sqlx.DB) {
-	// init the repository of the shop
-	repo := repos.NewShopRepo(store)
+	// init the repositories 
+	shopRepo := repos.NewShopRepo(store)
+	subRepo := repos.NewSubscriberRepo(store)	
 
 	// init the http controllers from using repo
-	controllers := controllers.NewShopControllers(repo)
+	controllers := controllers.NewShopControllers(shopRepo, subRepo)
 
 	// set routes of bot group
 	bot := r.Group("/bot")

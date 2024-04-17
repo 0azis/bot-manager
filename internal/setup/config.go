@@ -36,7 +36,7 @@ func NewDBConfig() *dbConfig{
 // compiler httpConfig* struct 
 func NewHTTPConfig() *httpConfig {
 	return &httpConfig{
-		host: getEnv("HTTP_HOST", "localhost"),
+		host: getEnv("HTTP_HOST", "0.0.0.0"),
 		port: getEnv("HTTP_PORT", "8000"),
 	}
 }

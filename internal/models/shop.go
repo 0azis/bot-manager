@@ -8,7 +8,7 @@ import (
 type Shop struct {
 	ID     string `json:"ID" db:"id"`
 	UserID string `json:"userID" db:"userId"`
-	BotID  int    `json:"botID" db:"botId"`
+	BotID  int    `json:"botID" db:"bot_id"`
 
 	CreatedDate string `json:"createdDate" db:"createdDate"`
 	UpdatedDate string `json:"updatedDate" db:"updatedDate"`
