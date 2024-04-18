@@ -6,25 +6,25 @@ import (
 )
 
 type Shop struct {
-	ID     string `json:"ID" db:"id"`
-	UserID string `json:"userID" db:"userId"`
-	BotID  int    `json:"botID" db:"bot_id"`
+	ID     string `db:"id"`
+	UserID string `db:"userId"`
+	BotID  int    `db:"bot_id"`
 
-	CreatedDate string `json:"createdDate" db:"createdDate"`
-	UpdatedDate string `json:"updatedDate" db:"updatedDate"`
+	CreatedDate string `db:"createdDate"`
+	UpdatedDate string `db:"updatedDate"`
 
-	Token       string `json:"token" db:"token"`
-	TitleButton string `json:"titleButton" db:"titleButton"`
-	Description string `json:"description" db:"description"`
+	Token       string `db:"token"`
+	TitleButton string `db:"titleButton"`
+	Description string `db:"description"`
 
-	FirstName string `json:"firstName" db:"firstName"`
-	Username  string `json:"username" db:"username"`
+	FirstName string `db:"firstName"`
+	Username  string `db:"username"`
 
-	Greetings   string `json:"greetings" db:"greetings"`
-	FirstLaunch string `json:"firstLaunch" db:"firstLaunch"`
-	AfterOrder  string `json:"afterOrder" db:"afterOrder"`
+	Greetings   string `db:"greetings"`
+	FirstLaunch string `db:"firstLaunch"`
+	AfterOrder  string `db:"afterOrder"`
 
-	IsActive bool `json:"isActive" db:"isActive"`
+	IsActive bool `db:"isActive"`
 }
 
 func WebLink(id string) string {
@@ -35,5 +35,3 @@ func WebLink(id string) string {
 type ShopCredentials struct {
 	Token string `json:"token"`
 }
-
- 

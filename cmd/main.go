@@ -2,8 +2,11 @@ package main
 
 import (
 	// "botmanager/internal/repos"
+	"botmanager/internal/models"
 	"botmanager/internal/routes"
 	"botmanager/internal/setup"
+	"botmanager/internal/tools"
+
 	// "fmt"
 	"log/slog"
 
@@ -31,17 +34,16 @@ func main() {
 		return 
 	}
 
-	// repo := repos.NewSubscriberRepo(store)
-	// subs, _ := repo.Select()
-	// fmt.Println(subs)
-
 	// set up http server
 	httpConfig := setup.NewHTTPConfig()
 	app := setup.NewHTTPServer()
 
+	// init goroutines pool
+	pool := models.NewGoroutinesPool()
+
 	// init routes and bots
-	routes.InitRoutes(app, store)
-	err = setup.InitBots(store)
+	routes.InitRoutes(app, store, pool)
+	err = tools.InitBots(store, pool)
 	if err != nil {
 		slog.Error("init bots failed")
 		return 
