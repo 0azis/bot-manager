@@ -13,7 +13,7 @@ type ShopRepo interface {
 	Get(token string) (models.Shop, error)
 	UpdateStatus(token string, status bool) error
 	IsTokenValid(token string) bool
-	ShopByBot(botID string) (string, error)
+	GetBy(key string, value any) (models.Shop, error)
 }
 
 type shop struct {
@@ -34,9 +34,10 @@ func (s shop) Get(token string) (models.Shop, error) {
 	return shop, err
 }
 
-func (s shop) ShopByBot(botID string) (string, error) {
-	var shopID string
-	err := s.db.Get(&shopID, `select id from shop where bot_id = $1`, botID)
+func (s shop) GetBy(key string, value any) (models.Shop, error) {
+	var shopID models.Shop 
+	// fmt.Println(fmt.Sprintf("select * from shop where %s = '%s'", key, value))
+	err := s.db.Get(&shopID, fmt.Sprintf("select * from shop where %s = '%s'", key, value))
 	return shopID, err
 }
 

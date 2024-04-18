@@ -9,5 +9,5 @@ type Subscriber struct {
 	TelegramID  string `json:"telegramId" db:"telegram_id"`
 	AvatarUrl   string `json:"avatarUrl" db:"avatar_url"`
 	UserName    string `json:"userName" db:"username"`
-	ShopID      string `json:"shopID" db:"shopId"`
+	ShopID      string `json:"shopID" db:"shop_id"`
 }
