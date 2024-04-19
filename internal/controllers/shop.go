@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"botmanager/internal/models"
+	"botmanager/internal/models/goroutine"
 	"botmanager/internal/repos"
-	"botmanager/internal/tools"
 	"fmt"
 	"net/http"
 
@@ -16,9 +16,8 @@ import (
 
 // implement controllers from repo
 type ShopControllers struct {
-	shopRepo repos.ShopRepo
-	subRepo  repos.SubscriberRepo
-	pool *models.GoroutinesPool
+	store repos.Store
+	pool goroutine.GoroutinesPool
 }
 
 func (sc ShopControllers) RunOneBot(c *fiber.Ctx) error {
@@ -27,28 +26,27 @@ func (sc ShopControllers) RunOneBot(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(400, http.StatusText(400))
 	}
-
+	fmt.Println(sc.pool)
 	// check for already running bot
 	if sc.pool.Exists(shopCredentials.Token) {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
 	// check for unvalid token
-	if sc.shopRepo.IsTokenValid(shopCredentials.Token) {
+	if sc.store.Shop().IsTokenValid(shopCredentials.Token) {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
-	// create a channel for this goroutine
-	ch := make(chan models.ChannelMessage)
-	fmt.Println(ch)
-	// // add goroutine and its channel to map
-	sc.pool.Add(shopCredentials.Token, ch)
+	botData, err := sc.store.Shop().Get(shopCredentials.Token)
+	if err != nil {
+		return fiber.NewError(500, http.StatusText(500))
+	}
 
-	// // start goroutine
-	go tools.BotWorker(shopCredentials.Token, sc.shopRepo, sc.subRepo, sc.pool)
-
-	msg := models.WorkType(true)
-	ch <- msg 
+	goroutine, err := goroutine.New(botData, sc.store, sc.pool)
+	if err != nil {
+		return fiber.NewError(500, http.StatusText(500))
+	}
+	goroutine.Start()
 
 	return fiber.NewError(200, http.StatusText(200))
 }
@@ -61,31 +59,19 @@ func (sc ShopControllers) StopOneBot(c *fiber.Ctx) error {
 	}
 
 	// check for unvalid token
-	if sc.shopRepo.IsTokenValid(shopCredentials.Token) {
+	if sc.store.Shop().IsTokenValid(shopCredentials.Token) {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
-	// get channel from map
-	ch := sc.pool.Get(shopCredentials.Token)
+	goroutine := sc.pool.Get(shopCredentials.Token)
+	goroutine.Stop()	
 
-	// check for empty channel
-	if ch == nil {
-		return fiber.NewError(400, http.StatusText(400))
-	}
-
-	msg := models.WorkType(false) 
-
-	ch <- msg 
-
-	// delete goroutine from map
-	sc.pool.Delete(shopCredentials.Token)
 	return fiber.NewError(200, http.StatusText(200))
 }
 
-func NewShopControllers(shopRepo repos.ShopRepo, subRepo repos.SubscriberRepo, pool *models.GoroutinesPool) *ShopControllers {
+func NewShopControllers(store repos.Store, pool goroutine.GoroutinesPool) *ShopControllers {
 	return &ShopControllers{
-		shopRepo: shopRepo,
-		subRepo:  subRepo,
+		store: store,
 		pool: pool,
 	}
 }

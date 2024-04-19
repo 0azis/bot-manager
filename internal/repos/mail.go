@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type MailRepo interface {
+type mailRepo interface {
 	Get(mailID string) (models.Mail, error)
 }
 
@@ -18,10 +18,4 @@ func (m mail) Get(mailID string) (models.Mail, error) {
 	var mail models.Mail
 	err := m.db.Get(&mail, `select * from share where id = $1`, mailID)
 	return mail, err
-}
-
-func NewMailRepo(db *sqlx.DB) *mail {
-	return &mail{
-		db: db,
-	}
 }
