@@ -1,13 +1,13 @@
 package routes
 
 import (
-	"botmanager/internal/models"
+	"botmanager/internal/models/goroutine"
+	"botmanager/internal/repos"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/jmoiron/sqlx"
 )
 
-func InitRoutes(app *fiber.App, store *sqlx.DB, pool *models.GoroutinesPool) {
+func InitRoutes(app *fiber.App, store repos.Store, pool goroutine.GoroutinesPool) {
 	// init the main API router
 	r := app.Group("/v1")
 

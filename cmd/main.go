@@ -1,11 +1,11 @@
 package main
 
 import (
-	// "botmanager/internal/repos"
-	"botmanager/internal/models"
+	"botmanager/internal/models/goroutine"
+	"botmanager/internal/repos"
 	"botmanager/internal/routes"
 	"botmanager/internal/setup"
-	"botmanager/internal/tools"
+	"fmt"
 
 	// "fmt"
 	"log/slog"
@@ -22,7 +22,7 @@ func main() {
 
 	// import database
 	dbConfig := setup.NewDBConfig()
-	store, err := setup.NewDB(
+	store, err := repos.NewDB(
 		dbConfig.User,
 		dbConfig.Password,
 		dbConfig.Host,
@@ -39,19 +39,37 @@ func main() {
 	app := setup.NewHTTPServer()
 
 	// init goroutines pool
-	pool := models.NewGoroutinesPool()
+	pool := goroutine.NewPool() 
+
+	err = initBots(store, pool)
+	if err != nil {
+		slog.Warn("init bots failed")
+	}
 
 	// init routes and bots
 	routes.InitRoutes(app, store, pool)
-	err = tools.InitBots(store, pool)
-	if err != nil {
-		slog.Error("init bots failed")
-		return 
-	}
 
 	err = app.Listen(httpConfig.BuildIP())
 	if err != nil {
 		slog.Error("http server running failed")
 		return
 	}
+}
+
+// init all bots from DB as application runs
+func initBots(store repos.Store, pool goroutine.GoroutinesPool) error {
+	bots, err := store.Shop().Select()
+	if err != nil {
+		return err
+	}
+
+	for bot := range bots {
+		g, err := goroutine.New(bots[bot], store, pool)	
+		if err != nil {
+			continue
+		}	
+		g.Start()
+		fmt.Println(pool)
+	}
+	return nil
 }

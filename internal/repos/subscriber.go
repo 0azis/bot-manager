@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type SubscriberRepo interface {
+type subscriberRepo interface {
 	Insert(sub models.Subscriber) error
 	Select(shopID string) ([]models.Subscriber, error)
 	IsSubscribed(tgID, shopID string) bool
@@ -31,10 +31,4 @@ func (s subscriber) IsSubscribed(tgID, shopID string) bool {
 	var id string
 	s.db.Get(&id, "select id from subscriber where telegram_id = $1 and shop_id = $2", tgID, shopID)
 	return id != ""
-}
-
-func NewSubscriberRepo(db *sqlx.DB) *subscriber {
-	return &subscriber{
-		db: db,
-	}
 }

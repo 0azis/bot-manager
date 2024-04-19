@@ -8,7 +8,7 @@ import (
 )
 
 // interface for shop
-type ShopRepo interface {
+type shopRepo interface {
 	Select() ([]models.Shop, error)
 	Get(token string) (models.Shop, error)
 	UpdateStatus(token string, status bool) error
@@ -51,11 +51,4 @@ func (s shop) IsTokenValid(token string) bool {
 	var isToken string
 	err := s.db.Get(&isToken, `select token from shop where token = $1`, token)
 	return err != nil
-}
-
-// init a new shop repository
-func NewShopRepo(db *sqlx.DB) *shop {
-	return &shop{
-		db: db,
-	}
 }
