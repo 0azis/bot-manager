@@ -4,6 +4,7 @@ import (
 	"botmanager/internal/models"
 	"botmanager/internal/repos"
 	"context"
+
 	tg_models "github.com/go-telegram/bot/models"
 
 	"github.com/go-telegram/bot"
@@ -20,11 +21,11 @@ type Goroutine struct {
 	botData models.Shop
 	bot     *bot.Bot
 	ctx     context.Context
-	pool    GoroutinesPool
+	pool    *GoroutinesPool
 	store   repos.Store
 }
 
-func New(botData models.Shop, store repos.Store, pool GoroutinesPool) (*Goroutine, error) {
+func New(botData models.Shop, store repos.Store, pool *GoroutinesPool) (*Goroutine, error) {
 	var goroutine Goroutine	
 
 	goroutine.store = store
@@ -36,9 +37,6 @@ func New(botData models.Shop, store repos.Store, pool GoroutinesPool) (*Goroutin
 		return &goroutine, err
 	}
 	goroutine.bot = b
-
-	ctx := context.Background()
-	goroutine.ctx = ctx
 
 	ch := make(chan ChannelMessage)
 	goroutine.channel = ch
@@ -59,11 +57,11 @@ func (g *Goroutine) Start() {
 }
 
 // Stop the goroutine
-func (g Goroutine) Stop() {
+func (g *Goroutine) Stop() {
 	msg := StatusWork(false)
 	g.channel <- msg
 
-	g.pool.Delete(g.botData.Token)
+	g.pool.Delete(g)
 }
 
 // Send message for all subscribers
@@ -101,23 +99,26 @@ func (g Goroutine) SendMessages(mail models.Mail) error {
 	return nil
 }
 
-func (g Goroutine) run() {
+func (g *Goroutine) run() {
+	ctx, done := context.WithCancel(context.Background()) 
+	defer done()
+	g.ctx = ctx
+
 	for {
 		select {
 		case msg := <-g.channel:
-
 			switch msg.MsgType {
-
 			case "status":
 				switch msg.Value {
 				case false:
 					close(g.channel)
-					g.ctx.Done()
+					return	
 				case true:
 					go g.bot.Start(g.ctx)
 				}
 			case "mail":
-				return
+				mail := msg.Value.(models.Mail)
+				g.SendMessages(mail)	
 			}
 		}
 	}

@@ -2,11 +2,11 @@ package setup
 
 import "os"
 
-// Db Config 
+// Db Config
 type dbConfig struct {
 	User     string // db_user
 	Password string // db_user password
-	DbName string // name of the main database 
+	DbName   string // name of the main database
 	Host     string // host of the database (localhost by default)
 	Port     string // port of the database (5433 by default)
 }
@@ -23,17 +23,17 @@ func (hc httpConfig) BuildIP() string {
 }
 
 // compile dbConfig* struct
-func NewDBConfig() *dbConfig{
+func NewDBConfig() *dbConfig {
 	return &dbConfig{
-		User: getEnv("DATABASE_USER", ""),
-		Password: getEnv("DATABASE_PASSWORD", ""), 
-		DbName: getEnv("DATABASE_DB", ""),
-		Host: getEnv("DATABASE_HOST", "localhost"), 
-		Port: getEnv("DATABASE_PORT", "5433"),
+		User:     getEnv("DATABASE_USER", ""),
+		Password: getEnv("DATABASE_PASSWORD", ""),
+		DbName:   getEnv("DATABASE_DB", ""),
+		Host:     getEnv("DATABASE_HOST", "localhost"),
+		Port:     getEnv("DATABASE_PORT", "5433"),
 	}
-} 
+}
 
-// compiler httpConfig* struct 
+// compiler httpConfig* struct
 func NewHTTPConfig() *httpConfig {
 	return &httpConfig{
 		host: getEnv("HTTP_HOST", "0.0.0.0"),

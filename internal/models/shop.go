@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	// "github.com/go-telegram/bot"
 )
 
 type Shop struct {

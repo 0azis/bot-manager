@@ -1,67 +1,68 @@
 package goroutine
 
-import "botmanager/internal/models"
+import (
+	"botmanager/internal/models"
+)
 
-// {"token": *channel}
-// basic message form
-type GoroutinesPool []Goroutine 
+type GoroutinesPool struct {
+	pool []*Goroutine
+}
 
-func NewPool() GoroutinesPool {
-	var gp GoroutinesPool
+func NewPool() *GoroutinesPool {
+	gp := new(GoroutinesPool)
 	return gp
-}  
+}
 
 func (g GoroutinesPool) Exists(token string) bool {
-	for goroutine := range g {
-		if g[goroutine].botData.Token == token {
+	for goroutine := range g.pool {
+		if g.pool[goroutine].botData.Token == token {
 			return true
-		}	
+		}
 	}
 	return false
 }
 
-func (g GoroutinesPool) Get(token string) Goroutine {
-	for goroutine := range g {
-		if g[goroutine].botData.Token == token {
-			return g[goroutine]
+func (g GoroutinesPool) Get(token string) *Goroutine {
+	for goroutine := range g.pool {
+		if g.pool[goroutine].botData.Token == token {
+			return g.pool[goroutine]
 		}
 	}
-	return Goroutine{} 
+	return nil 
 }
 
-func (g GoroutinesPool) Add(goroutine *Goroutine) {
-	g = append(g, *goroutine)
+func (g *GoroutinesPool) Add(goroutine *Goroutine) {
+	g.pool = append(g.pool, goroutine)
 }
 
-func (g GoroutinesPool) Delete(token string) {
-	var delEl int
-	for goroutine := range g {
-		if g[goroutine].botData.Token == token {
-			delEl = goroutine
-			g = append(g[:delEl], g[delEl+1:]...)
+func (g *GoroutinesPool) Delete(goroutine *Goroutine) {
+	for i := range g.pool {
+		if g.pool[i] == goroutine {
+			g.pool = append(g.pool[:i], g.pool[i+1:]...)
+			break
 		}
 	}
 }
 
 type ChannelMessage struct {
 	MsgType string
-	Value any 
-} 
+	Value   any
+}
 
 // Return message for channel, that start the bot
 func StatusWork(status bool) ChannelMessage {
 	msg := ChannelMessage{
-		MsgType: "status", 	
-		Value: status,
+		MsgType: "status",
+		Value:   status,
 	}
 	return msg
 }
 
-// Return message for channel, that send mail 
+// Return message for channel, that send mail
 func SendMail(mail models.Mail) ChannelMessage {
 	msg := ChannelMessage{
 		MsgType: "mail",
-		Value: mail,
+		Value:   mail,
 	}
 	return msg
 }

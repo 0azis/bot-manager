@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func shopRoutes(r fiber.Router, store repos.Store, pool goroutine.GoroutinesPool) {
+func shopRoutes(r fiber.Router, store repos.Store, pool *goroutine.GoroutinesPool) {
 	controllers := controllers.NewShopControllers(store, pool)
 
 	// set routes of bot group
