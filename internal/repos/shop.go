@@ -35,8 +35,7 @@ func (s shop) Get(token string) (models.Shop, error) {
 }
 
 func (s shop) GetBy(key string, value any) (models.Shop, error) {
-	var shopID models.Shop 
-	// fmt.Println(fmt.Sprintf("select * from shop where %s = '%s'", key, value))
+	var shopID models.Shop
 	err := s.db.Get(&shopID, fmt.Sprintf("select * from shop where %s = '%s'", key, value))
 	return shopID, err
 }

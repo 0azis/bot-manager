@@ -1,4 +1,4 @@
-package repos 
+package repos
 
 import (
 	"fmt"
@@ -9,8 +9,8 @@ import (
 )
 
 type StoreRepos interface {
-	Shop() shopRepo 
-	Subscriber() subscriberRepo 
+	Shop() shopRepo
+	Subscriber() subscriberRepo
 	Mail() mailRepo
 }
 
@@ -21,7 +21,7 @@ type Store struct {
 func (s Store) Shop() shopRepo {
 	return &shop{
 		db: s.db,
-	}	
+	}
 }
 
 func (s Store) Subscriber() subscriberRepo {

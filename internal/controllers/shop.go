@@ -4,12 +4,7 @@ import (
 	"botmanager/internal/models"
 	"botmanager/internal/models/goroutine"
 	"botmanager/internal/repos"
-	"fmt"
 	"net/http"
-
-	// "time"
-
-	// "time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,7 +12,7 @@ import (
 // implement controllers from repo
 type ShopControllers struct {
 	store repos.Store
-	pool goroutine.GoroutinesPool
+	pool  *goroutine.GoroutinesPool
 }
 
 func (sc ShopControllers) RunOneBot(c *fiber.Ctx) error {
@@ -26,7 +21,6 @@ func (sc ShopControllers) RunOneBot(c *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(400, http.StatusText(400))
 	}
-	fmt.Println(sc.pool)
 	// check for already running bot
 	if sc.pool.Exists(shopCredentials.Token) {
 		return fiber.NewError(400, http.StatusText(400))
@@ -63,15 +57,19 @@ func (sc ShopControllers) StopOneBot(c *fiber.Ctx) error {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
-	goroutine := sc.pool.Get(shopCredentials.Token)
-	goroutine.Stop()	
+	runGoroutine := sc.pool.Get(shopCredentials.Token)
+	if runGoroutine == nil {
+		return fiber.NewError(404, http.StatusText(404))
+	}
+
+	runGoroutine.Stop()
 
 	return fiber.NewError(200, http.StatusText(200))
 }
 
-func NewShopControllers(store repos.Store, pool goroutine.GoroutinesPool) *ShopControllers {
+func NewShopControllers(store repos.Store, pool *goroutine.GoroutinesPool) *ShopControllers {
 	return &ShopControllers{
 		store: store,
-		pool: pool,
+		pool:  pool,
 	}
 }

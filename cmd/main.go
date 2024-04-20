@@ -5,9 +5,7 @@ import (
 	"botmanager/internal/repos"
 	"botmanager/internal/routes"
 	"botmanager/internal/setup"
-	"fmt"
 
-	// "fmt"
 	"log/slog"
 
 	"github.com/joho/godotenv"
@@ -31,7 +29,7 @@ func main() {
 	)
 	if err != nil {
 		slog.Error("database running failed")
-		return 
+		return
 	}
 
 	// set up http server
@@ -39,14 +37,14 @@ func main() {
 	app := setup.NewHTTPServer()
 
 	// init goroutines pool
-	pool := goroutine.NewPool() 
+	pool := goroutine.NewPool()
 
 	err = initBots(store, pool)
 	if err != nil {
 		slog.Warn("init bots failed")
 	}
 
-	// init routes and bots
+	// init routes
 	routes.InitRoutes(app, store, pool)
 
 	err = app.Listen(httpConfig.BuildIP())
@@ -57,19 +55,18 @@ func main() {
 }
 
 // init all bots from DB as application runs
-func initBots(store repos.Store, pool goroutine.GoroutinesPool) error {
+func initBots(store repos.Store, pool *goroutine.GoroutinesPool) error {
 	bots, err := store.Shop().Select()
 	if err != nil {
 		return err
 	}
 
 	for bot := range bots {
-		g, err := goroutine.New(bots[bot], store, pool)	
+		g, err := goroutine.New(bots[bot], store, pool)
 		if err != nil {
 			continue
-		}	
+		}
 		g.Start()
-		fmt.Println(pool)
 	}
 	return nil
 }

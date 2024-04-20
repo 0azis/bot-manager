@@ -8,8 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func mailRoutes(r fiber.Router, store repos.Store, pool goroutine.GoroutinesPool) {
-	controllers := controllers.NewMailControllers(store, pool)
+func mailRoutes(r fiber.Router, store repos.Store, pool *goroutine.GoroutinesPool) {
+	controllers := controllers.NewMailControllers(store, *pool)
 
 	mail := r.Group("/mail")
 	mail.Post("/", controllers.Send)

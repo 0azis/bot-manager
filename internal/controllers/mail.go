@@ -29,7 +29,12 @@ func (mc MailControllers) Send(c *fiber.Ctx) error {
 		return fiber.NewError(500, http.StatusText(500))
 	}
 
-	goroutine := mc.pool.Get(credentials.ID)
+	shop, err := mc.store.Shop().GetBy("id", mail.ShopID)
+	if err != nil {
+		return fiber.NewError(500, http.StatusText(500))
+	}
+
+	goroutine := mc.pool.Get(shop.Token)
 	err = goroutine.SendMessages(mail)
 	if err != nil {
 		return fiber.NewError(500, http.StatusText(500))
