@@ -1,9 +1,9 @@
 package main
 
 import (
-	"botmanager/internal/models/goroutine"
-	"botmanager/internal/repos"
-	"botmanager/internal/routes"
+	"botmanager/internal/adapter/http/route"
+	"botmanager/internal/adapter/repo"
+	"botmanager/internal/core/telegram"
 	"botmanager/internal/setup"
 
 	"log/slog"
@@ -20,7 +20,7 @@ func main() {
 
 	// import database
 	dbConfig := setup.NewDBConfig()
-	store, err := repos.NewDB(
+	store, err := repo.NewDB(
 		dbConfig.User,
 		dbConfig.Password,
 		dbConfig.Host,
@@ -37,15 +37,15 @@ func main() {
 	app := setup.NewHTTPServer()
 
 	// init goroutines pool
-	pool := goroutine.NewPool()
+	pool := telegram.NewPool()
 
-	err = initBots(store, pool)
+	err = initBots(*store, pool)
 	if err != nil {
-		slog.Warn("init bots failed")
+		slog.Error("init bots failed")
 	}
 
 	// init routes
-	routes.InitRoutes(app, store, pool)
+	route.InitRoutes(app, *store, pool)
 
 	err = app.Listen(httpConfig.BuildIP())
 	if err != nil {
@@ -55,14 +55,14 @@ func main() {
 }
 
 // init all bots from DB as application runs
-func initBots(store repos.Store, pool *goroutine.GoroutinesPool) error {
-	bots, err := store.Shop().Select()
+func initBots(store repo.Store, pool *telegram.GoroutinesPool) error {
+	bots, err := store.Shop.Select()
 	if err != nil {
 		return err
 	}
 
 	for bot := range bots {
-		g, err := goroutine.New(bots[bot], store, pool)
+		g, err := telegram.New(bots[bot], store, pool)
 		if err != nil {
 			continue
 		}

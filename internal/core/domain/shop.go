@@ -1,4 +1,4 @@
-package models
+package domain 
 
 import (
 	"fmt"
@@ -32,5 +32,5 @@ func WebLink(id string) string {
 }
 
 type ShopCredentials struct {
-	Token string `json:"token"`
+	ID string `json:"ID"`
 }
