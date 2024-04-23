@@ -1,4 +1,4 @@
-package models
+package domain 
 
 type Mail struct {
 	ID          string `db:"id"`

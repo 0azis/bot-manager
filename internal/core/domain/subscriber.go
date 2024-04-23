@@ -1,4 +1,4 @@
-package models
+package domain 
 
 type Subscriber struct {
 	ID          string `json:"ID" db:"id"`

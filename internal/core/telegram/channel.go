@@ -1,11 +1,11 @@
-package goroutine
+package telegram
 
 import (
-	"botmanager/internal/models"
+	"botmanager/internal/core/domain"
 )
 
 type GoroutinesPool struct {
-	pool []*Goroutine
+	pool []*goroutine
 }
 
 func NewPool() *GoroutinesPool {
@@ -13,29 +13,29 @@ func NewPool() *GoroutinesPool {
 	return gp
 }
 
-func (g GoroutinesPool) Exists(token string) bool {
+func (g GoroutinesPool) Exists(ID string) bool {
 	for goroutine := range g.pool {
-		if g.pool[goroutine].botData.Token == token {
+		if g.pool[goroutine].botData.ID == ID{
 			return true
 		}
 	}
 	return false
 }
 
-func (g GoroutinesPool) Get(token string) *Goroutine {
+func (g GoroutinesPool) Get(ID string) goroutineInterface {
 	for goroutine := range g.pool {
-		if g.pool[goroutine].botData.Token == token {
+		if g.pool[goroutine].botData.ID == ID {
 			return g.pool[goroutine]
 		}
 	}
-	return nil 
+	return nil
 }
 
-func (g *GoroutinesPool) Add(goroutine *Goroutine) {
+func (g *GoroutinesPool) Add(goroutine *goroutine) {
 	g.pool = append(g.pool, goroutine)
 }
 
-func (g *GoroutinesPool) Delete(goroutine *Goroutine) {
+func (g *GoroutinesPool) Delete(goroutine *goroutine) {
 	for i := range g.pool {
 		if g.pool[i] == goroutine {
 			g.pool = append(g.pool[:i], g.pool[i+1:]...)
@@ -59,10 +59,19 @@ func StatusWork(status bool) ChannelMessage {
 }
 
 // Return message for channel, that send mail
-func SendMail(mail models.Mail) ChannelMessage {
+func SendMail(mail domain.Mail) ChannelMessage {
 	msg := ChannelMessage{
 		MsgType: "mail",
 		Value:   mail,
+	}
+	return msg
+}
+
+// Return message for channel, that send message
+func SendMessage(message domain.Message) ChannelMessage {
+	msg := ChannelMessage{
+		MsgType: "message",
+		Value:   message,
 	}
 	return msg
 }
