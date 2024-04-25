@@ -1,9 +1,11 @@
 package setup
 
-import "os"
+import (
+	"os"
+)
 
 // Db Config
-type dbConfig struct {
+type db struct {
 	User     string // db_user
 	Password string // db_user password
 	DbName   string // name of the main database
@@ -11,20 +13,8 @@ type dbConfig struct {
 	Port     string // port of the database (5433 by default)
 }
 
-// HTTP Config
-type httpConfig struct {
-	host string // host of the server (localhost by default)
-	port string // port of the server (8000 by default)
-}
-
-// constructor for full socket IP address
-func (hc httpConfig) BuildIP() string {
-	return hc.host + ":" + hc.port
-}
-
-// compile dbConfig* struct
-func NewDBConfig() *dbConfig {
-	return &dbConfig{
+func dbConfig() *db {
+	return &db{
 		User:     getEnv("DATABASE_USER", ""),
 		Password: getEnv("DATABASE_PASSWORD", ""),
 		DbName:   getEnv("DATABASE_DB", ""),
@@ -33,11 +23,50 @@ func NewDBConfig() *dbConfig {
 	}
 }
 
-// compiler httpConfig* struct
-func NewHTTPConfig() *httpConfig {
-	return &httpConfig{
-		host: getEnv("HTTP_HOST", "0.0.0.0"),
-		port: getEnv("HTTP_PORT", "8000"),
+// HTTP Config
+type http struct {
+	Host string // host of the server (localhost by default)
+	Port string // port of the server (8000 by default)
+}
+
+// constructor for full socket IP address
+func (hc http) BuildIP() string {
+	return hc.Host + ":" + hc.Port
+}
+
+// compile httpConfig* struct
+func httpConfig() *http {
+	return &http{
+		Host: getEnv("HTTP_HOST", "0.0.0.0"),
+		Port: getEnv("HTTP_PORT", "8000"),
+	}
+}
+
+type redisDb struct {
+	Host string
+	Port string
+}
+
+// compile redis* struct
+func redisConfig() *redisDb {
+	return &redisDb{
+		Host: getEnv("REDIS_HOST", "127.0.0.1"),
+		Port: getEnv("REDIS_PORT", "6739"),
+	}
+}
+
+// constructor for full socket IP address
+func (rd redisDb) BuildIP() string {
+	return rd.Host + ":" + rd.Port
+}
+
+type homeBot struct {
+	Token string
+}
+
+func homeBotConfig() *homeBot {
+	return &homeBot{
+		Token: getEnv("TOKEN", ""),
 	}
 }
 

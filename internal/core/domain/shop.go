@@ -1,4 +1,4 @@
-package domain 
+package domain
 
 import (
 	"fmt"
@@ -6,24 +6,24 @@ import (
 
 type Shop struct {
 	ID     string `db:"id"`
-	UserID string `db:"userId"`
+	UserID string `db:"user_id"`
 	BotID  int    `db:"bot_id"`
 
-	CreatedDate string `db:"createdDate"`
-	UpdatedDate string `db:"updatedDate"`
+	CreatedDate string `db:"created_date"`
+	UpdatedDate string `db:"updated_date"`
 
 	Token       string `db:"token"`
-	TitleButton string `db:"titleButton"`
+	TitleButton string `db:"title_button"`
 	Description string `db:"description"`
 
-	FirstName string `db:"firstName"`
+	FirstName string `db:"first_name"`
 	Username  string `db:"username"`
 
 	Greetings   string `db:"greetings"`
-	FirstLaunch string `db:"firstLaunch"`
-	AfterOrder  string `db:"afterOrder"`
+	FirstLaunch string `db:"first_launch"`
+	AfterOrder  string `db:"after_order"`
 
-	IsActive bool `db:"isActive"`
+	IsActive bool `db:"is_active"`
 }
 
 func WebLink(id string) string {
@@ -32,5 +32,13 @@ func WebLink(id string) string {
 }
 
 type ShopCredentials struct {
-	ID string `json:"ID"`
+	Token string `json:"token"`
+}
+
+type ShopBot struct {
+	Data Shop
+}
+
+type HomeBot struct {
+	Token string
 }
