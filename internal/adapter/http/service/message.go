@@ -2,8 +2,8 @@ package service
 
 import (
 	"botmanager/internal/adapter/repo"
-	"botmanager/internal/core/telegram"
 	"botmanager/internal/core/domain"
+	"botmanager/internal/core/goroutine"
 	"botmanager/internal/core/port/service"
 	"net/http"
 
@@ -12,7 +12,7 @@ import (
 
 type messageService struct {
 	store repo.Store
-	pool  *telegram.GoroutinesPool
+	pool  *goroutine.GoroutinesPool
 }
 
 func (mc messageService) SendMessage(c *fiber.Ctx) error {
@@ -35,8 +35,7 @@ func (mc messageService) SendMessage(c *fiber.Ctx) error {
 		return fiber.NewError(500, http.StatusText(500))
 	}
 
-	goroutine := mc.pool.Get(shop.ID)
-
+	goroutine := mc.pool.Get(shop.Token)
 	err = goroutine.SendMessage(message)
 	if err != nil {
 		return fiber.NewError(500, http.StatusText(500))
@@ -45,7 +44,7 @@ func (mc messageService) SendMessage(c *fiber.Ctx) error {
 	return fiber.NewError(200, http.StatusText(200))
 }
 
-func NewMessageControllers(store repo.Store, pool *telegram.GoroutinesPool) service.MessageService {
+func NewMessageControllers(store repo.Store, pool *goroutine.GoroutinesPool) service.MessageService {
 	return messageService{
 		store: store,
 		pool:  pool,

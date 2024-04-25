@@ -2,8 +2,9 @@ package main
 
 import (
 	"botmanager/internal/adapter/http/route"
+	"botmanager/internal/adapter/redis"
 	"botmanager/internal/adapter/repo"
-	"botmanager/internal/core/telegram"
+	"botmanager/internal/core/goroutine"
 	"botmanager/internal/setup"
 
 	"log/slog"
@@ -15,58 +16,69 @@ func main() {
 	// load ENV data (database config, http server config and etc.)
 	if err := godotenv.Load("../.env"); err != nil {
 		slog.Error("environment not found")
-		return
 	}
 
+	// get application config
+	config := setup.New()
+
 	// import database
-	dbConfig := setup.NewDBConfig()
 	store, err := repo.NewDB(
-		dbConfig.User,
-		dbConfig.Password,
-		dbConfig.Host,
-		dbConfig.Port,
-		dbConfig.DbName,
+		config.Store.User,
+		config.Store.Password,
+		config.Store.Host,
+		config.Store.Port,
+		config.Store.DbName,
 	)
 	if err != nil {
 		slog.Error("database running failed")
-		return
 	}
 
-	// set up http server
-	httpConfig := setup.NewHTTPConfig()
-	app := setup.NewHTTPServer()
+	redisDb, err := redis.NewRedis(config.Redis.BuildIP())
+	if err != nil {
+		slog.Error("redis running failed")
+	}
 
 	// init goroutines pool
-	pool := telegram.NewPool()
+	pool := goroutine.NewPool()
 
-	err = initBots(*store, pool)
+	err = initBots(config.HomeBot.Token, redisDb, *store, pool)
 	if err != nil {
 		slog.Error("init bots failed")
 	}
 
+	// set up http server
+	app := setup.NewHTTPServer()
+
 	// init routes
 	route.InitRoutes(app, *store, pool)
 
-	err = app.Listen(httpConfig.BuildIP())
+	err = app.Listen(config.Http.BuildIP())
 	if err != nil {
 		slog.Error("http server running failed")
-		return
 	}
 }
 
 // init all bots from DB as application runs
-func initBots(store repo.Store, pool *telegram.GoroutinesPool) error {
+func initBots(homeBotToken string, redisDB redis.RedisInterface, store repo.Store, pool *goroutine.GoroutinesPool) error {
 	bots, err := store.Shop.Select()
 	if err != nil {
 		return err
 	}
 
+	homeBot, err := goroutine.NewHomeBot(homeBotToken, pool, redisDB)
+	if err != nil {
+		return err
+	}
+	homeBot.InitHomeHandlers()
+	homeBot.Start()
+
 	for bot := range bots {
-		g, err := telegram.New(bots[bot], store, pool)
+		shopBot, err := goroutine.NewShopBot(bots[bot].Token, pool, store)
 		if err != nil {
 			continue
 		}
-		g.Start()
+		shopBot.InitShopHandlers()
+		shopBot.Start()
 	}
 	return nil
 }

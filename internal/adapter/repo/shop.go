@@ -29,9 +29,3 @@ func (s shop) GetByBotID(botID string) (domain.Shop, error) {
 	err := s.db.Get(&shop, `select * from shop where bot_id = $1`, botID)
 	return shop, err
 }
-
-// func (s shop) GetBy(key string, value any) (domain.Shop, error) {
-// 	var shopID domain.Shop
-// 	err := s.db.Get(&shopID, fmt.Sprintf("select * from shop where %s = '%s'", key, value))
-// 	return shopID, err
-// }

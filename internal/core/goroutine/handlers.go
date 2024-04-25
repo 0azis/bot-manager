@@ -1,7 +1,8 @@
-package telegram
+package goroutine
 
 import (
 	"botmanager/internal/core/domain"
+	"botmanager/internal/core/utils"
 	"context"
 	"strconv"
 
@@ -9,18 +10,26 @@ import (
 	tg_domain "github.com/go-telegram/bot/models"
 )
 
-func (g goroutine) initHandlers() {
+func (g goroutine) InitShopHandlers() {
 	g.bot.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, g.startHandler)
 }
 
+func (g goroutine) InitHomeHandlers() {
+	g.bot.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, g.setButton)
+	g.bot.RegisterHandler(bot.HandlerTypeMessageText, "Получить код", bot.MatchTypeExact, g.sendCode)
+}
+
 func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
+	botData, _ := b.GetMe(ctx)
+	shopData, _ := g.store.Shop.GetByBotID(strconv.FormatInt(botData.ID, 10))
+
 	b.SetChatMenuButton(ctx, &bot.SetChatMenuButtonParams{
 		ChatID: update.Message.From.ID,
 		MenuButton: tg_domain.MenuButtonWebApp{
 			Type: "web_app",
-			Text: g.botData.TitleButton,
+			Text: shopData.TitleButton,
 			WebApp: tg_domain.WebAppInfo{
-				URL: domain.WebLink(g.botData.ID),
+				URL: domain.WebLink(shopData.ID),
 			},
 		},
 	})
@@ -40,21 +49,21 @@ func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *tg_doma
 	}
 
 	telegramID := strconv.FormatInt(update.Message.From.ID, 10)
-	if !g.store.Subscriber.IsSubscribed(telegramID, g.botData.ID) {
+	if !g.store.Subscriber.IsSubscribed(telegramID, shopData.ID) {
 		s := domain.Subscriber{
 			UserName:   update.Message.From.Username,
 			FirstName:  update.Message.From.FirstName,
 			LastName:   update.Message.From.LastName,
 			AvatarUrl:  url,
 			TelegramID: telegramID,
-			ShopID:     g.botData.ID,
+			ShopID:     shopData.ID,
 		}
 		g.store.Subscriber.Insert(s)
 	}
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: update.Message.Chat.ID,
-		Text:   g.botData.FirstLaunch,
+		Text:   shopData.FirstLaunch,
 	})
 }
 
@@ -79,4 +88,37 @@ func (g goroutine) listenMessages(ctx context.Context, b *bot.Bot, update *tg_do
 			Text:   "Произошла ошибка при отправке сообщения менеджеру. Попробуйте позже.",
 		})
 	}
+}
+
+func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
+	code := utils.GenerateCode()
+	err := g.redisDB.SetCode(strconv.FormatInt(update.Message.From.ID, 10), code)
+	if err != nil {
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: update.Message.From.ID,
+			Text:   "Неизвестная ошибка при отправке кода. Пожалуйста попробуйте позже",
+		})
+		return
+	}
+	b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: update.Message.From.ID,
+		Text:   code,
+	})
+}
+
+func (g goroutine) setButton(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
+	kb := &tg_domain.ReplyKeyboardMarkup{
+		Keyboard: [][]tg_domain.KeyboardButton{
+			{
+				{Text: "Получить код"},
+			},
+		},
+		ResizeKeyboard: true,
+	}
+	b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID:      update.Message.From.ID,
+		Text:        "Запросите код",
+		ReplyMarkup: kb,
+	})
+
 }
