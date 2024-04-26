@@ -2,7 +2,6 @@ package domain
 
 type User struct {
 	ID           string `db:"id"`
-	Code         string `db:"code"`
 	TelegramID   string `db:"telegram_id"`
 	FirstName    string `db:"first_name"`
 	LastName     string `db:"last_name"`
