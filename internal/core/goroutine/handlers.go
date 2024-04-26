@@ -16,7 +16,7 @@ func (g goroutine) InitShopHandlers() {
 
 func (g goroutine) InitHomeHandlers() {
 	g.bot.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, g.setButton)
-	g.bot.RegisterHandler(bot.HandlerTypeMessageText, "Получить код", bot.MatchTypeExact, g.sendCode)
+	g.bot.RegisterHandler(bot.HandlerTypeMessageText, "🔐 Получить код", bot.MatchTypeExact, g.sendCode)
 }
 
 func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
@@ -100,9 +100,44 @@ func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *tg_domain.U
 		})
 		return
 	}
+
+	user := update.Message.From
+
+	var url string
+	photos, _ := b.GetUserProfilePhotos(ctx, &bot.GetUserProfilePhotosParams{
+		UserID: user.ID,
+	})
+
+	if photos.TotalCount == 0 {
+		url = ""
+	} else {
+		file, _ := b.GetFile(ctx, &bot.GetFileParams{
+			FileID: photos.Photos[0][0].FileID,
+		})
+		url = b.FileDownloadLink(file)
+	}
+
+	u := domain.User{
+		Code:         "",
+		TelegramID:   strconv.FormatInt(user.ID, 10),
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		UserName:     user.Username,
+		IsPremium:    user.IsPremium,
+		LanguageCode: user.LanguageCode,
+		AvatarUrl:    url,
+	}
+	err = g.store.User.Insert(u)
+	if err != nil {
+		b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: update.Message.From.ID,
+			Text:   err.Error(),
+		})
+	}
 	b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID: update.Message.From.ID,
-		Text:   code,
+		ChatID:    update.Message.From.ID,
+		Text:      "<b>Код активен 30 секунд:</b> " + code,
+		ParseMode: "HTML",
 	})
 }
 
@@ -110,7 +145,7 @@ func (g goroutine) setButton(ctx context.Context, b *bot.Bot, update *tg_domain.
 	kb := &tg_domain.ReplyKeyboardMarkup{
 		Keyboard: [][]tg_domain.KeyboardButton{
 			{
-				{Text: "Получить код"},
+				{Text: "🔐 Получить код"},
 			},
 		},
 		ResizeKeyboard: true,

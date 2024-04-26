@@ -24,3 +24,7 @@ type MessageRepository interface {
 type MailRepository interface {
 	Get(mailID string) (domain.Mail, error)
 }
+
+type UserRepository interface {
+	Insert(user domain.User) error
+}

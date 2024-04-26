@@ -15,11 +15,12 @@ type Store struct {
 	Subscriber repository.SubscriberRepository
 	Message    repository.MessageRepository
 	Mail       repository.MailRepository
+	User       repository.UserRepository
 }
 
-func NewDB(user, password, host, port, dbName string) (*Store, error) {
+func NewDB(userDB, password, host, port, dbName string) (*Store, error) {
 	// full URI using env variables
-	DB_URI := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, password, host, port, dbName)
+	DB_URI := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", userDB, password, host, port, dbName)
 
 	// getting db object
 	db, err := sqlx.Connect("pgx", DB_URI)
@@ -28,6 +29,7 @@ func NewDB(user, password, host, port, dbName string) (*Store, error) {
 		Subscriber: subscriber{db},
 		Message:    message{db},
 		Mail:       mail{db},
+		User:       user{db},
 	}
 	return s, err
 }

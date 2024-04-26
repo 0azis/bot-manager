@@ -65,7 +65,7 @@ func initBots(homeBotToken string, redisDB redis.RedisInterface, store repo.Stor
 		return err
 	}
 
-	homeBot, err := goroutine.NewHomeBot(homeBotToken, pool, redisDB)
+	homeBot, err := goroutine.NewHomeBot(homeBotToken, pool, store, redisDB)
 	if err != nil {
 		return err
 	}
