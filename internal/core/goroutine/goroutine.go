@@ -56,10 +56,11 @@ func NewShopBot(token string, pool *GoroutinesPool, store repo.Store) (goroutine
 	return &goroutine, err
 }
 
-func NewHomeBot(token string, pool *GoroutinesPool, redisDB redis.RedisInterface) (goroutineInterface, error) {
+func NewHomeBot(token string, pool *GoroutinesPool, store repo.Store, redisDB redis.RedisInterface) (goroutineInterface, error) {
 	var goroutine goroutine
 
 	goroutine.pool = pool
+	goroutine.store = store
 	goroutine.token = token
 	goroutine.redisDB = redisDB
 
