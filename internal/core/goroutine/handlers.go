@@ -118,7 +118,6 @@ func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *tg_domain.U
 	}
 
 	u := domain.User{
-		Code:         "",
 		TelegramID:   strconv.FormatInt(user.ID, 10),
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
