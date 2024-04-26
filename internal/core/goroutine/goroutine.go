@@ -1,8 +1,8 @@
 package goroutine
 
 import (
-	"botmanager/internal/adapter/redis"
-	"botmanager/internal/adapter/repo"
+	"botmanager/internal/adapter/secondary/database"
+	"botmanager/internal/adapter/secondary/redis"
 	"botmanager/internal/core/domain"
 	"context"
 
@@ -30,33 +30,11 @@ type goroutine struct {
 	bot     *bot.Bot
 	ctx     context.Context
 	pool    *GoroutinesPool
-	store   repo.Store
+	store   database.Store
 	redisDB redis.RedisInterface
 }
 
-func NewShopBot(token string, pool *GoroutinesPool, store repo.Store) (goroutineInterface, error) {
-	var goroutine goroutine
-
-	goroutine.pool = pool
-	goroutine.token = token
-	goroutine.store = store
-
-	opts := []bot.Option{
-		bot.WithDefaultHandler(goroutine.listenMessages),
-	}
-	b, err := bot.New(token, opts...)
-	if err != nil {
-		return &goroutine, err
-	}
-	goroutine.bot = b
-
-	ch := make(chan channelMessage)
-	goroutine.channel = ch
-
-	return &goroutine, err
-}
-
-func NewHomeBot(token string, pool *GoroutinesPool, store repo.Store, redisDB redis.RedisInterface) (goroutineInterface, error) {
+func New(token string, pool *GoroutinesPool, store database.Store, redisDB redis.RedisInterface) (goroutineInterface, error) {
 	var goroutine goroutine
 
 	goroutine.pool = pool

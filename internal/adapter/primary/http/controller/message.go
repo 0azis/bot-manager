@@ -1,7 +1,7 @@
-package service
+package controller 
 
 import (
-	"botmanager/internal/adapter/repo"
+	"botmanager/internal/adapter/secondary/database"
 	"botmanager/internal/core/domain"
 	"botmanager/internal/core/goroutine"
 	"botmanager/internal/core/port/service"
@@ -11,7 +11,7 @@ import (
 )
 
 type messageService struct {
-	store repo.Store
+	store database.Store
 	pool  *goroutine.GoroutinesPool
 }
 
@@ -44,7 +44,7 @@ func (mc messageService) SendMessage(c *fiber.Ctx) error {
 	return fiber.NewError(200, http.StatusText(200))
 }
 
-func NewMessageControllers(store repo.Store, pool *goroutine.GoroutinesPool) service.MessageService {
+func NewMessageControllers(store database.Store, pool *goroutine.GoroutinesPool) service.MessageService {
 	return messageService{
 		store: store,
 		pool:  pool,

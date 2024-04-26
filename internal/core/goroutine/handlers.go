@@ -20,11 +20,12 @@ func (g goroutine) InitHomeHandlers() {
 }
 
 func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
+	user := update.Message.From
 	botData, _ := b.GetMe(ctx)
 	shopData, _ := g.store.Shop.GetByBotID(strconv.FormatInt(botData.ID, 10))
 
 	b.SetChatMenuButton(ctx, &bot.SetChatMenuButtonParams{
-		ChatID: update.Message.From.ID,
+		ChatID: user.ID,
 		MenuButton: tg_domain.MenuButtonWebApp{
 			Type: "web_app",
 			Text: shopData.TitleButton,
@@ -34,26 +35,14 @@ func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *tg_doma
 		},
 	})
 
-	var url string
-	photos, _ := b.GetUserProfilePhotos(ctx, &bot.GetUserProfilePhotosParams{
-		UserID: update.Message.From.ID,
-	})
+	url := utils.GetTelegramPhoto(b, ctx, user.ID)
 
-	if photos.TotalCount == 0 {
-		url = ""
-	} else {
-		file, _ := b.GetFile(ctx, &bot.GetFileParams{
-			FileID: photos.Photos[0][0].FileID,
-		})
-		url = b.FileDownloadLink(file)
-	}
-
-	telegramID := strconv.FormatInt(update.Message.From.ID, 10)
+	telegramID := strconv.FormatInt(user.ID, 10)
 	if !g.store.Subscriber.IsSubscribed(telegramID, shopData.ID) {
 		s := domain.Subscriber{
-			UserName:   update.Message.From.Username,
-			FirstName:  update.Message.From.FirstName,
-			LastName:   update.Message.From.LastName,
+			UserName:   user.Username,
+			FirstName:  user.FirstName,
+			LastName:   user.LastName,
 			AvatarUrl:  url,
 			TelegramID: telegramID,
 			ShopID:     shopData.ID,
@@ -62,7 +51,7 @@ func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *tg_doma
 	}
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
-		ChatID: update.Message.Chat.ID,
+		ChatID: user.ID,
 		Text:   shopData.FirstLaunch,
 	})
 }
@@ -91,31 +80,19 @@ func (g goroutine) listenMessages(ctx context.Context, b *bot.Bot, update *tg_do
 }
 
 func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
+	user := update.Message.From
+
 	code := utils.GenerateCode()
 	err := g.redisDB.SetCode(strconv.FormatInt(update.Message.From.ID, 10), code)
 	if err != nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: update.Message.From.ID,
+			ChatID: user.ID,
 			Text:   "Неизвестная ошибка при отправке кода. Пожалуйста попробуйте позже",
 		})
 		return
 	}
 
-	user := update.Message.From
-
-	var url string
-	photos, _ := b.GetUserProfilePhotos(ctx, &bot.GetUserProfilePhotosParams{
-		UserID: user.ID,
-	})
-
-	if photos.TotalCount == 0 {
-		url = ""
-	} else {
-		file, _ := b.GetFile(ctx, &bot.GetFileParams{
-			FileID: photos.Photos[0][0].FileID,
-		})
-		url = b.FileDownloadLink(file)
-	}
+	url := utils.GetTelegramPhoto(b, ctx, user.ID)
 
 	u := domain.User{
 		TelegramID:   strconv.FormatInt(user.ID, 10),
@@ -130,9 +107,11 @@ func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *tg_domain.U
 	if err != nil {
 		b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: update.Message.From.ID,
-			Text:   err.Error(),
+			Text:   "Неизвестная ошибка при отправке кода. Пожалуйста попробуйте позже",
 		})
+		return
 	}
+
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    update.Message.From.ID,
 		Text:      "<b>Код активен 30 секунд:</b> " + code,

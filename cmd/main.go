@@ -1,9 +1,9 @@
 package main
 
 import (
-	"botmanager/internal/adapter/http/route"
-	"botmanager/internal/adapter/redis"
-	"botmanager/internal/adapter/repo"
+	"botmanager/internal/adapter/primary/http"
+	"botmanager/internal/adapter/secondary/database"
+	"botmanager/internal/adapter/secondary/redis"
 	"botmanager/internal/core/goroutine"
 	"botmanager/internal/setup"
 
@@ -22,7 +22,7 @@ func main() {
 	config := setup.New()
 
 	// import database
-	store, err := repo.NewDB(
+	store, err := database.NewDB(
 		config.Store.User,
 		config.Store.Password,
 		config.Store.Host,
@@ -50,7 +50,7 @@ func main() {
 	app := setup.NewHTTPServer()
 
 	// init routes
-	route.InitRoutes(app, *store, pool)
+	http.InitRoutes(app, *store, pool)
 
 	err = app.Listen(config.Http.BuildIP())
 	if err != nil {
@@ -59,13 +59,13 @@ func main() {
 }
 
 // init all bots from DB as application runs
-func initBots(homeBotToken string, redisDB redis.RedisInterface, store repo.Store, pool *goroutine.GoroutinesPool) error {
+func initBots(homeBotToken string, redisDB redis.RedisInterface, store database.Store, pool *goroutine.GoroutinesPool) error {
 	bots, err := store.Shop.Select()
 	if err != nil {
 		return err
 	}
 
-	homeBot, err := goroutine.NewHomeBot(homeBotToken, pool, store, redisDB)
+	homeBot, err := goroutine.New(homeBotToken, pool, store, redisDB)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func initBots(homeBotToken string, redisDB redis.RedisInterface, store repo.Stor
 	homeBot.Start()
 
 	for bot := range bots {
-		shopBot, err := goroutine.NewShopBot(bots[bot].Token, pool, store)
+		shopBot, err := goroutine.New(bots[bot].Token, pool, store, redisDB)
 		if err != nil {
 			continue
 		}
