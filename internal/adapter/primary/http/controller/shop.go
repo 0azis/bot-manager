@@ -1,7 +1,8 @@
-package service
+package controller
 
 import (
-	"botmanager/internal/adapter/repo"
+	"botmanager/internal/adapter/secondary/database"
+	"botmanager/internal/adapter/secondary/redis"
 	"botmanager/internal/core/domain"
 	"botmanager/internal/core/goroutine"
 	"botmanager/internal/core/port/service"
@@ -11,8 +12,9 @@ import (
 )
 
 type shopService struct {
-	pool  *goroutine.GoroutinesPool
-	store repo.Store
+	pool    *goroutine.GoroutinesPool
+	store   database.Store
+	redisDB redis.RedisInterface
 }
 
 func (sc shopService) RunOneBot(c *fiber.Ctx) error {
@@ -35,10 +37,11 @@ func (sc shopService) RunOneBot(c *fiber.Ctx) error {
 		return fiber.NewError(500, http.StatusText(500))
 	}
 
-	shopBot, err := goroutine.NewShopBot(botData.Token, sc.pool, sc.store)
+	shopBot, err := goroutine.New(botData.Token, sc.pool, sc.store, sc.redisDB)
 	if err != nil {
 		return fiber.NewError(500, http.StatusText(500))
 	}
+	shopBot.InitShopHandlers()
 	shopBot.Start()
 
 	return fiber.NewError(200, http.StatusText(200))
@@ -60,7 +63,7 @@ func (sc shopService) StopOneBot(c *fiber.Ctx) error {
 	return fiber.NewError(200, http.StatusText(200))
 }
 
-func NewShopControllers(pool *goroutine.GoroutinesPool, store repo.Store) service.ShopService {
+func NewShopControllers(pool *goroutine.GoroutinesPool, store database.Store) service.ShopService {
 	return shopService{
 		pool:  pool,
 		store: store,

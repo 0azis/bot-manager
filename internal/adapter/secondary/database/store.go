@@ -1,4 +1,4 @@
-package repo
+package database 
 
 import (
 	"botmanager/internal/core/port/repository"
