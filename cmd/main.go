@@ -50,7 +50,7 @@ func main() {
 	app := setup.NewHTTPServer()
 
 	// init routes
-	http.InitRoutes(app, *store, pool)
+	http.InitRoutes(app, *store, pool, config.HomeBot.Token)
 
 	err = app.Listen(config.Http.BuildIP())
 	if err != nil {
