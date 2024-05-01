@@ -6,12 +6,13 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/go-telegram/bot"
-	tg_domain "github.com/go-telegram/bot/models"
+	"github.com/0azis/bot"
+	"github.com/0azis/bot/models"
 )
 
 func (g goroutine) InitShopHandlers() {
 	g.bot.RegisterHandler(bot.HandlerTypeMessageText, "/start", bot.MatchTypeExact, g.startHandler)
+	g.bot.SetDefaultHandler(g.listenMessages)
 }
 
 func (g goroutine) InitHomeHandlers() {
@@ -19,17 +20,17 @@ func (g goroutine) InitHomeHandlers() {
 	g.bot.RegisterHandler(bot.HandlerTypeMessageText, "🔐 Получить код", bot.MatchTypeExact, g.sendCode)
 }
 
-func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
+func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	user := update.Message.From
 	botData, _ := b.GetMe(ctx)
 	shopData, _ := g.store.Shop.GetByBotID(strconv.FormatInt(botData.ID, 10))
 
 	b.SetChatMenuButton(ctx, &bot.SetChatMenuButtonParams{
 		ChatID: user.ID,
-		MenuButton: tg_domain.MenuButtonWebApp{
+		MenuButton: models.MenuButtonWebApp{
 			Type: "web_app",
 			Text: shopData.TitleButton,
-			WebApp: tg_domain.WebAppInfo{
+			WebApp: models.WebAppInfo{
 				URL: domain.WebLink(shopData.ID),
 			},
 		},
@@ -56,7 +57,7 @@ func (g goroutine) startHandler(ctx context.Context, b *bot.Bot, update *tg_doma
 	})
 }
 
-func (g goroutine) listenMessages(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
+func (g goroutine) listenMessages(ctx context.Context, b *bot.Bot, update *models.Update) {
 	botData, _ := b.GetMe(ctx)
 
 	shop, _ := g.store.Shop.GetByBotID(strconv.FormatInt(botData.ID, 10))
@@ -79,7 +80,7 @@ func (g goroutine) listenMessages(ctx context.Context, b *bot.Bot, update *tg_do
 	}
 }
 
-func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
+func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *models.Update) {
 	user := update.Message.From
 
 	code := utils.GenerateCode()
@@ -119,9 +120,9 @@ func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *tg_domain.U
 	})
 }
 
-func (g goroutine) setButton(ctx context.Context, b *bot.Bot, update *tg_domain.Update) {
-	kb := &tg_domain.ReplyKeyboardMarkup{
-		Keyboard: [][]tg_domain.KeyboardButton{
+func (g goroutine) setButton(ctx context.Context, b *bot.Bot, update *models.Update) {
+	kb := &models.ReplyKeyboardMarkup{
+		Keyboard: [][]models.KeyboardButton{
 			{
 				{Text: "🔐 Получить код"},
 			},

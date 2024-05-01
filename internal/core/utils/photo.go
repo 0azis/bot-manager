@@ -3,7 +3,7 @@ package utils
 import (
 	"context"
 
-	"github.com/go-telegram/bot"
+	"github.com/0azis/bot"
 )
 
 // GetTelegramPhoto return URL for user avatar

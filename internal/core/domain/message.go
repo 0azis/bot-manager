@@ -1,4 +1,4 @@
-package domain 
+package domain
 
 type Message struct {
 	ID           string `json:"ID" db:"id"`

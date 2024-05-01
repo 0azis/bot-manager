@@ -4,7 +4,7 @@ type Config struct {
 	Store   *db
 	Http    *http
 	Redis   *redisDb
-	HomeBot *homeBot
+	HomeBot *homeBotToken
 }
 
 func New() *Config {

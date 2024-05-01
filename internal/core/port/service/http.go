@@ -14,3 +14,7 @@ type MessageService interface {
 type MailService interface {
 	SendMail(c *fiber.Ctx) error
 }
+
+type NotificationService interface {
+	SendNotification(c *fiber.Ctx) error
+}

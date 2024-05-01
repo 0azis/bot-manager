@@ -1,4 +1,4 @@
-package http 
+package http
 
 import (
 	"botmanager/internal/adapter/primary/http/controller"
@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitRoutes(app *fiber.App, store database.Store, pool *goroutine.GoroutinesPool) {
+func InitRoutes(app *fiber.App, store database.Store, pool *goroutine.GoroutinesPool, homeBot string) {
 	// init the main API router
 	r := app.Group("/v1")
 
@@ -16,6 +16,7 @@ func InitRoutes(app *fiber.App, store database.Store, pool *goroutine.Goroutines
 	shopRoutes(r, store, pool)
 	mailRoutes(r, store, pool)
 	messageRoutes(r, store, pool)
+	notificationRoutes(r, store, pool, homeBot)
 }
 
 func shopRoutes(r fiber.Router, store database.Store, pool *goroutine.GoroutinesPool) {
@@ -39,4 +40,11 @@ func mailRoutes(r fiber.Router, store database.Store, pool *goroutine.Goroutines
 
 	mail := r.Group("/mail")
 	mail.Post("/", controllers.SendMail)
+}
+
+func notificationRoutes(r fiber.Router, store database.Store, pool *goroutine.GoroutinesPool, homeBot string) {
+	controllers := controller.NewNotificationService(store, pool, homeBot)
+
+	notification := r.Group("/notification")
+	notification.Post("/", controllers.SendNotification)
 }
