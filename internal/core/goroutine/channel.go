@@ -1,9 +1,5 @@
 package goroutine
 
-import (
-	"botmanager/internal/core/domain"
-)
-
 type GoroutinesPool struct {
 	pool []*goroutine
 }
@@ -28,7 +24,7 @@ func (g GoroutinesPool) Get(token string) *goroutine {
 			return g.pool[goroutine]
 		}
 	}
-	return nil 
+	return nil
 }
 
 func (g *GoroutinesPool) Add(goroutine *goroutine) {
@@ -42,36 +38,4 @@ func (g *GoroutinesPool) Delete(goroutine *goroutine) {
 			break
 		}
 	}
-}
-
-type channelMessage struct {
-	MsgType string
-	Value   any
-}
-
-// Return message for channel, that start the bot
-func StatusWork(status bool) channelMessage {
-	msg := channelMessage{
-		MsgType: "status",
-		Value:   status,
-	}
-	return msg
-}
-
-// Return message for channel, that send mail
-func SendMail(mail domain.Mail) channelMessage {
-	msg := channelMessage{
-		MsgType: "mail",
-		Value:   mail,
-	}
-	return msg
-}
-
-// Return message for channel, that send message
-func SendMessage(message domain.Message) channelMessage {
-	msg := channelMessage{
-		MsgType: "message",
-		Value:   message,
-	}
-	return msg
 }

@@ -6,6 +6,7 @@ type ShopRepository interface {
 	Select() ([]domain.Shop, error)
 	Get(ID string) (domain.Shop, error)
 	GetByBotID(botID string) (domain.Shop, error)
+	GetByToken(token string) (domain.Shop, error)
 }
 
 type SubscriberRepository interface {

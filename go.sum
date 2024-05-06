@@ -1,7 +1,3 @@
-github.com/0azis/bot v0.0.0-20240427200335-9538e66dab87 h1:/hPULqvZ/pxB6hyhouKZlx/f3M2ZAQTpQXVZ3zFVYNU=
-github.com/0azis/bot v0.0.0-20240427200335-9538e66dab87/go.mod h1:+sK/j9Y3LnbaXdVz/2GzWC/5MC2mr6bqQsvfue7ZSS8=
-github.com/0azis/bot v0.0.0-20240427201110-58b71839f04f h1:vU0V9p+zxwsFtjXVY3jT6CvuKIqHem+1aSvPQ2zMXvs=
-github.com/0azis/bot v0.0.0-20240427201110-58b71839f04f/go.mod h1:+sK/j9Y3LnbaXdVz/2GzWC/5MC2mr6bqQsvfue7ZSS8=
 github.com/0azis/bot v0.0.0-20240427201326-c2b26a29d6ff h1:0OxeYk8sDhO5d+QjquB8l3ID9jwciDCC30VqY3GFI7Y=
 github.com/0azis/bot v0.0.0-20240427201326-c2b26a29d6ff/go.mod h1:+sK/j9Y3LnbaXdVz/2GzWC/5MC2mr6bqQsvfue7ZSS8=
 github.com/andybalholm/brotli v1.0.5 h1:8uQZIdzKmjc/iuPu7O2ioW48L81FgatrcpfFmiq/cCs=
@@ -18,8 +14,6 @@ github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/r
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
 github.com/go-sql-driver/mysql v1.6.0 h1:BCTh4TKNUYmOmMUcQ3IipzF5prigylS7XXjEkfCHuOE=
 github.com/go-sql-driver/mysql v1.6.0/go.mod h1:DCzpHaOWr8IXmIStZouvnhqoel9Qv2LBy8hT2VhHyBg=
-github.com/go-telegram/bot v1.2.2 h1:LwGbSzjcSi0w4Ke8JUpgbBhJwwYTl2ITmhubeM2WvN8=
-github.com/go-telegram/bot v1.2.2/go.mod h1:i2TRs7fXWIeaceF3z7KzsMt/he0TwkVC680mvdTFYeM=
 github.com/gofiber/fiber/v2 v2.52.4 h1:P+T+4iK7VaqUsq2PALYEfBBo6bJZ4q3FP8cZ84EggTM=
 github.com/gofiber/fiber/v2 v2.52.4/go.mod h1:KEOE+cXMhXG0zHc9d8+E38hoX+ZN7bhOtgeF2oT6jrQ=
 github.com/gofrs/uuid v4.4.0+incompatible h1:3qXRTX8/NbyulANqlc0lchS1gqAVxRgsuW1YrTJupqA=

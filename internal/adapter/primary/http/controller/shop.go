@@ -24,11 +24,11 @@ func (sc shopService) RunOneBot(c *fiber.Ctx) error {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 	// check for already running bot
-	if sc.pool.Exists(shopCredentials.ID) {
+	if sc.pool.Exists(shopCredentials.Token) {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
-	botData, err := sc.store.Shop.Get(shopCredentials.ID)
+	botData, err := sc.store.Shop.GetByToken(shopCredentials.Token)
 	if botData.Token == "" {
 		return fiber.NewError(404, http.StatusText(404))
 	}
@@ -54,9 +54,9 @@ func (sc shopService) StopOneBot(c *fiber.Ctx) error {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
-	shopBot := sc.pool.Get(shopCredentials.ID)
+	shopBot := sc.pool.Get(shopCredentials.Token)
 	if shopBot == nil {
-		return fiber.NewError(400, http.StatusText(400))
+		return fiber.NewError(404, http.StatusText(404))
 	}
 
 	shopBot.Stop()

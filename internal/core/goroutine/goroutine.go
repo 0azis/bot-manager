@@ -23,12 +23,11 @@ type goroutineInterface interface {
 	SendNotification(notification domain.Notification) error // send notification to home bot
 	InitShopHandlers()                                       // init handlers for shop bot
 	InitHomeHandlers()                                       // init handlers for home bot
-	// SendNotification(notification domain.Notification)
 }
 
 type goroutine struct {
 	token   string
-	channel chan channelMessage
+	channel chan bool
 	bot     *bot.Bot
 	ctx     context.Context
 	pool    *GoroutinesPool
@@ -50,7 +49,7 @@ func New(token string, pool *GoroutinesPool, store database.Store, redisDB redis
 	}
 	goroutine.bot = b
 
-	ch := make(chan channelMessage)
+	ch := make(chan bool)
 	goroutine.channel = ch
 
 	return &goroutine, err
@@ -62,14 +61,12 @@ func (g *goroutine) Start() {
 
 	go g.run()
 
-	msg := StatusWork(true)
-	g.channel <- msg
+	g.channel <- true
 }
 
 // Stop the goroutine
 func (g *goroutine) Stop() {
-	msg := StatusWork(false)
-	g.channel <- msg
+	g.channel <- false
 
 	g.pool.Delete(g)
 }
@@ -169,17 +166,14 @@ func (g *goroutine) run() {
 	for {
 		select {
 		case msg := <-g.channel:
-			switch msg.MsgType {
-			case "status":
-				switch msg.Value {
-				case false:
-					close(g.channel)
-					return
-				case true:
-					go g.bot.Start(g.ctx)
-				}
-
+			switch msg {
+			case false:
+				close(g.channel)
+				return
+			case true:
+				go g.bot.Start(g.ctx)
 			}
+
 		}
 	}
 }
