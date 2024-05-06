@@ -32,5 +32,5 @@ func WebLink(id string) string {
 }
 
 type ShopCredentials struct {
-	ID string `json:"ID"`
+	Token string `json:"token"`
 }
