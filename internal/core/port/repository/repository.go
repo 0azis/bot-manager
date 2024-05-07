@@ -7,6 +7,7 @@ type ShopRepository interface {
 	Get(ID string) (domain.Shop, error)
 	GetByBotID(botID string) (domain.Shop, error)
 	GetByToken(token string) (domain.Shop, error)
+	SetActive(status bool, shopID string) error
 }
 
 type SubscriberRepository interface {
@@ -28,5 +29,5 @@ type MailRepository interface {
 
 type UserRepository interface {
 	Insert(user domain.User) error
-	Get(ID string) (domain.User, error) 
+	Get(ID string) (domain.User, error)
 }
