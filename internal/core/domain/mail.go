@@ -7,7 +7,7 @@ type Mail struct {
 	Text        string `db:"text"`
 	AddButton   bool   `db:"addButton"`
 	PhotoLink   string `db:"photoLink"`
-	ShopID      string `db:"shopId"`
+	ShopID      string `db:"shop_id"`
 }
 
 type MailCredentials struct {

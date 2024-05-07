@@ -11,7 +11,7 @@ func NewHTTPServer() *fiber.App {
 
 	// use the built-in fiber logger for more info
 	app.Use(logger.New(logger.Config{
-		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
+		Format: "[${ip}]:${port} ${status} - ${method} ${path} ||${latency}\n",
 	}))
 
 	return app
