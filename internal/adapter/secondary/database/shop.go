@@ -35,3 +35,8 @@ func (s shop) GetByToken(token string) (domain.Shop, error) {
 	err := s.db.Get(&shop, `select * from shop where token = $1`, token)
 	return shop, err
 }
+
+func (s shop) SetActive(status bool, shopID string) error {
+	_, err := s.db.Query(`update shop set is_active = $1 where id = $2`, status, shopID)
+	return err
+}

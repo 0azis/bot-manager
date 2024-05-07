@@ -85,7 +85,7 @@ func (g goroutine) listenMessages(ctx context.Context, b *bot.Bot, update *model
 	newMsgNotification := domain.Notification{
 		UserID:   owner.TelegramID,
 		Text:     "Вам пришло новое сообщение",
-		Link:     "https://tgrocket.ru/message",
+		Link:     "https://tgrocket.ru/app/messages",
 		LinkText: "Читать сообщения",
 	}
 	homeBot := g.pool.GetHomeBot()
