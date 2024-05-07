@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// init goroutines pool
-	pool := goroutine.NewPool()
+	pool := goroutine.NewPool(config.HomeBot.Token)
 
 	err = initBots(config.HomeBot.Token, redisDb, *store, pool)
 	if err != nil {
