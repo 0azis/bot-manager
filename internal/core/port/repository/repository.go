@@ -28,4 +28,5 @@ type MailRepository interface {
 
 type UserRepository interface {
 	Insert(user domain.User) error
+	Get(ID string) (domain.User, error) 
 }

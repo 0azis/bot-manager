@@ -4,6 +4,7 @@ import (
 	"botmanager/internal/core/domain"
 	"botmanager/internal/core/utils"
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/0azis/bot"
@@ -78,6 +79,17 @@ func (g goroutine) listenMessages(ctx context.Context, b *bot.Bot, update *model
 			Text:   "Произошла ошибка при отправке сообщения менеджеру. Попробуйте позже.",
 		})
 	}
+
+	owner, _ := g.store.User.Get(shop.UserID)
+
+	newMsgNotification := domain.Notification{
+		UserID:   owner.TelegramID,
+		Text:     "Вам пришло новое сообщение",
+		Link:     "https://tgrocket.ru/message",
+		LinkText: "Читать сообщения",
+	}
+	homeBot := g.pool.GetHomeBot()
+	homeBot.SendNotification(newMsgNotification)
 }
 
 func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *models.Update) {
@@ -115,8 +127,8 @@ func (g goroutine) sendCode(ctx context.Context, b *bot.Bot, update *models.Upda
 
 	b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID:    update.Message.From.ID,
-		Text:      "<b>Код активен 30 секунд:</b> " + code,
-		ParseMode: "HTML",
+		Text:      fmt.Sprintf("*Код активен 30 секунд:* `%s`", code),
+		ParseMode: "Markdown",
 	})
 }
 

@@ -60,12 +60,12 @@ func (rd redisDb) BuildIP() string {
 	return rd.Host + ":" + rd.Port
 }
 
-type homeBotToken struct {
+type homeBot struct {
 	Token string
 }
 
-func homeBotConfig() *homeBotToken {
-	return &homeBotToken{
+func homeBotConfig() *homeBot {
+	return &homeBot{
 		Token: getEnv("TOKEN", ""),
 	}
 }

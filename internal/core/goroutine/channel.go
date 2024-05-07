@@ -2,11 +2,15 @@ package goroutine
 
 type GoroutinesPool struct {
 	pool []*goroutine
+
+	// homebot token
+	HomeBotToken string
 }
 
-func NewPool() *GoroutinesPool {
-	gp := new(GoroutinesPool)
-	return gp
+func NewPool(hbtoken string) *GoroutinesPool {
+	return &GoroutinesPool{
+		HomeBotToken: hbtoken,
+	}
 }
 
 func (g GoroutinesPool) Exists(token string) bool {
@@ -25,6 +29,10 @@ func (g GoroutinesPool) Get(token string) *goroutine {
 		}
 	}
 	return nil
+}
+
+func (g GoroutinesPool) GetHomeBot() *goroutine {
+	return g.Get(g.HomeBotToken)
 }
 
 func (g *GoroutinesPool) Add(goroutine *goroutine) {
