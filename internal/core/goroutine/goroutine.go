@@ -148,7 +148,7 @@ func (g goroutine) SendNotification(notification domain.Notification) error {
 		})
 	} else {
 		g.bot.SendMessage(g.ctx, &bot.SendMessageParams{
-			ChatID:      "992956951",
+			ChatID:      notification.UserID,
 			Text:        notification.Text + "\n\n" + fmt.Sprintf("<a href='%s'>%s</a>", notification.Link, notification.LinkText),
 			ReplyMarkup: kb,
 			ParseMode:   "HTML",
