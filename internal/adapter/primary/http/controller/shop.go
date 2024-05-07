@@ -43,7 +43,6 @@ func (sc shopService) RunOneBot(c *fiber.Ctx) error {
 	}
 	shopBot.InitShopHandlers()
 	shopBot.Start()
-	sc.store.Shop.SetActive(true, botData.ID)
 
 	return fiber.NewError(200, http.StatusText(200))
 }
@@ -55,18 +54,12 @@ func (sc shopService) StopOneBot(c *fiber.Ctx) error {
 		return fiber.NewError(400, http.StatusText(400))
 	}
 
-	shop, err := sc.store.Shop.GetByToken(shopCredentials.Token)
-	if err != nil {
-		return fiber.NewError(500, http.StatusText(500))
-	}
-
 	shopBot := sc.pool.Get(shopCredentials.Token)
 	if shopBot == nil {
 		return fiber.NewError(404, http.StatusText(404))
 	}
 
 	shopBot.Stop()
-	err = sc.store.Shop.SetActive(false, shop.ID)
 
 	return fiber.NewError(200, http.StatusText(200))
 }

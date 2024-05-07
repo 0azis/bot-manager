@@ -7,7 +7,7 @@ type ShopRepository interface {
 	Get(ID string) (domain.Shop, error)
 	GetByBotID(botID string) (domain.Shop, error)
 	GetByToken(token string) (domain.Shop, error)
-	SetActive(status bool, shopID string) error
+	SetActive(status bool, token string) error
 }
 
 type SubscriberRepository interface {

@@ -36,7 +36,7 @@ func (s shop) GetByToken(token string) (domain.Shop, error) {
 	return shop, err
 }
 
-func (s shop) SetActive(status bool, shopID string) error {
-	_, err := s.db.Query(`update shop set is_active = $1 where id = $2`, status, shopID)
+func (s shop) SetActive(status bool, token string) error {
+	_, err := s.db.Query(`update shop set is_active = $1 where token = $2`, status, token)
 	return err
 }
