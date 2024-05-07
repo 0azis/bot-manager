@@ -62,6 +62,7 @@ func (g *goroutine) Start() {
 	go g.run()
 
 	g.channel <- true
+	g.store.Shop.SetActive(true, g.token)
 }
 
 // Stop the goroutine
@@ -69,6 +70,7 @@ func (g *goroutine) Stop() {
 	g.channel <- false
 
 	g.pool.Delete(g)
+	g.store.Shop.SetActive(false, g.token)
 }
 
 // Send mail for all subscribers
